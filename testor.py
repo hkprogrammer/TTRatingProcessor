@@ -17,7 +17,12 @@ def sampleImportTournament():
     
     t = open("sample1.csv")
     t2 = open("sample2.csv")
-    players = open("samplePlayers.csv")
+    t3 = open("november.csv")
+    # t4 = open("november.csv")
+    players = open("samplePlayers2.csv")
+    
+    
+    
     
     
     listOfPlayers = []
@@ -29,6 +34,8 @@ def sampleImportTournament():
         
         
     
+    november = Tournament("UCITT November Open", "", "", listOfPlayers)
+    november.importFile(t3)
     
     tournament = Tournament("UCITT December Open", "", "", listOfPlayers)
     tournament2 = Tournament("UCITT 2024 Winter Tryouts", "", "", listOfPlayers)
@@ -39,6 +46,9 @@ def sampleImportTournament():
     
     t.close()
     players.close()
+    
+    rp = RatingProcessor(november)
+    rp.calculate()
     
     rp = RatingProcessor(tournament)
     rp.calculate()

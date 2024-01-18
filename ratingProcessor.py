@@ -166,22 +166,18 @@ class RatingProcessor:
             if(len(playerWL["matchesWon"]) == 0 and len(playerWL["matchesLost"]) >= 1):
                 
                 
-                opponentList = self.getAllOpponents(player, self.matches[player.getID()])
+                # opponentList = self.getAllOpponents(player, self.matches[player.getID()])
+                worstLost = self.worstLost(player, [match for match in playerWL["matchesLost"] if match.getOpponent(player).getRating()  != 0 ])
+                worstLost = max(0, worstLost)
                 intermediate = 0
-                for opponent in opponentList:
-                    opponentWL = self.matchWL(opponent, self.matches[opponent.getID()])
-                    bestWin = self.bestWin(opponent, opponentWL["matchesWon"])
-                    worstLost = self.worstLost(opponent, opponentWL["matchesLost"])
-                    
-                    if bestWin == float("inf") or worstLost == float("inf"):
-                        #that means this opponent has not lost or not won a single match
-                        continue
-                    
-                
-                    
-                    diff = abs(bestWin - worstLost)
+                for opponent in self.tournament.getListOfPlayers():
                     
                     
+                    opponentPass2 = opponent.getPass2Adjustment()
+                    
+                    
+                    diff = abs(worstLost - opponentPass2)
+                    print(diff)
                     if 1<=diff<=50:
                         intermediate += 10
                         
@@ -194,9 +190,13 @@ class RatingProcessor:
                     
                 
                 
-                currentWorstLost = self.worstLost(player, playerWL["matchesLost"])
-                pass2Adjust = currentWorstLost + intermediate
+               
+                pass2Adjust = worstLost + intermediate
                 player.setPass2Adjustment(pass2Adjust)
+                
+                
+                print(player, pass2Adjust, intermediate)
+                # 1/0
                 
             
             
