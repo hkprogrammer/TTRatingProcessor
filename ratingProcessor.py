@@ -1,5 +1,5 @@
-from tournament import Tournament
-from tournament import testerTournament
+# from tournament import Tournament
+# from tournament import testerTournament
 from tournament import Player
 
 
@@ -10,7 +10,7 @@ class RatingProcessor:
     POINT_SPREAD = [[238,0,50], [213, 1, 45], [188, 1, 40], [163, 2, 35], [138, 2, 30], [113, 3, 25], [88, 4, 20], [63, 5, 16], [38, 6, 13], [13, 7, 10], [0, 8, 8]]
 
     
-    def __init__(self, tournament: Tournament):
+    def __init__(self, tournament: "Tournament"):
         self.tournament = tournament
         self.POINT_SPREAD = RatingProcessor.POINT_SPREAD
         self.matches = self.tournament.getMatches()
@@ -112,16 +112,19 @@ class RatingProcessor:
             if not listOfOpponents:
                 continue
             
-            print(listOfOpponents, player)
+            
             if self.allUnrated(listOfOpponents):
                 p2Adjustment = 1200
                 player.setPass2Adjustment(p2Adjustment)
-                print(player, player.getRating(), player.getPass1Final(), player.getPass2Adjustment())
+                
                 continue
             
             playerWL = self.matchWL(player, self.matches[player.getID()])
+                
+            
             if len(playerWL["matchesWon"]) >= 1 and len(playerWL["matchesLost"]) >= 1:
                 # assuming at least 1 player has a rating because of the prior if statment
+                
                 
                 
                 bestWin = self.bestWinPlayer(player, playerWL["matchesWon"])
@@ -130,6 +133,8 @@ class RatingProcessor:
                 
                 average = (bestWin.getPass2Adjustment() + worstLost.getPass2Adjustment()) // 2
                 player.setPass2Adjustment(average)
+                
+                
                 continue
             
             if(len(playerWL["matchesWon"]) >=1 and len(playerWL["matchesLost"]) == 0):
@@ -469,13 +474,3 @@ class RatingProcessor:
                              
     #     raise Exception(f"unknown point spread of {pointDiff} of p1: {player1}, p2: {player2}")
 
-
-if __name__ == "__main__":
-    
-    
-    tournament = testerTournament()
-    rp = RatingProcessor(tournament)
-    
-    print(rp.pass1())
-    print()
-    print(rp.pass2())
