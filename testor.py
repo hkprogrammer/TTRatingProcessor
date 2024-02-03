@@ -2,6 +2,8 @@ from tournament import *
 from ratingProcessor import *
 import pdfkit
 
+import datetime
+
 config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
 
 def generateReport(listOfPlayers):
@@ -21,7 +23,8 @@ def sampleImportTournament():
     t2 = open("sample2.csv")
     t3 = open("november.csv")
     # t4 = open("november.csv")
-    players = open("samplePlayers2.csv")
+
+    players = open("playerList.csv")
     
     
     
@@ -44,6 +47,7 @@ def sampleImportTournament():
     tournament.importFile(t)
     tournament2.importFile(t2)
     
+
     
     
     t.close()
@@ -57,7 +61,7 @@ def sampleImportTournament():
     
     rp2 = RatingProcessor(tournament2)
     rp2.calculate()
-    
+
     generateReport(listOfPlayers)
     
     for player in listOfPlayers:
@@ -72,7 +76,8 @@ def test():
     t2 = open("sample2.csv")
     t3 = open("november.csv")
     # t4 = open("november.csv")
-    players = open("samplePlayers2.csv")
+    players = open("playerList.csv")
+    t4 = open("tournaments/2-2GameNight.csv")
     
     listOfPlayers = []
     next(players)
@@ -82,26 +87,37 @@ def test():
         listOfPlayers.append(player)
         
         
-    november = Tournament("UCITT November Open", "", "", listOfPlayers)
+    november = Tournament("UCITT November Open", "11-19", "", listOfPlayers)
     november.importFile(t3)
     generateRatingReport(november)
     generatePDF(november)
     
-    december = Tournament("UCITT December Open", "", "", listOfPlayers)
+    december = Tournament("UCITT December Open", "12-2", "", listOfPlayers)
     december.importFile(t)
     generateRatingReport(december)
     generatePDF(december)
     
-    winterTryout = Tournament("UCITT 2024 Winter Tryouts", "", "", listOfPlayers)
+    winterTryout = Tournament("UCITT 2024 Winter Tryouts", "1-13 ~ 1-20", "", listOfPlayers)
     winterTryout.importFile(t2)
     generateRatingReport(winterTryout)
     generatePDF(winterTryout)
+    
+    
+    gameNightFeb2 = Tournament("UCITT Thursday Game Night", "2-2-2024", "Game Night", listOfPlayers)
+    gameNightFeb2.importFile(t4)
+    gameNightFeb2.setSpecialRule(lambda x: 500 if x==0 else -1)
+    generateRatingReport(gameNightFeb2)
+    generatePDF(gameNightFeb2)
+    
+    
+    generatePDFAllPlayers(listOfPlayers)
     
     
     
     t.close()
     t2.close()
     t3.close()
+    t4.close()
     
     
     
@@ -115,7 +131,7 @@ def generateRatingReport(tournament):
     
     try:
         calculateRating(tournament)
-        f = open(f"{tournament.tournamentName}_({tournament.tournamentDate})_RatingReport", "w")
+        f = open(f"{tournament.tournamentName}_({tournament.tournamentDate})_RatingReport", "w+")
         format = exportPlayerReport(tournament)
         f.write(format)
         f.close()
@@ -139,6 +155,36 @@ def exportPlayerReport(tournament):
 
 
 
+
+
+def generatePDFAllPlayers(listOfPlayers):
+    data = ["ID,Name,old rating,<b>new rating<b>,change".split(",")]
+   
+    for player in listOfPlayers:
+        
+        
+        d = [player.getID(), player.getName(),  player.getAbsoluteOriginalRating(), player.getRating(), player.getRating()-player.getAbsoluteOriginalRating()]
+        data.append(d)
+    
+    
+    #sorts
+    
+    data[1:] = list(sorted(data[1:], key=lambda x:x[3], reverse=True))
+    
+
+    title = f"All Player Rating Report"
+    
+    template = generateTemplate(data,title)
+    
+    f = open(f"All_Player_Rating_Report.html","w+")
+    f.write(template)
+    f.close()
+    
+    
+    pdfkit.from_file(f"All_Player_Rating_Report.html", f"All_Player_Rating_Report.pdf", configuration= config)
+    # pdfkit.from_file(f"{tournament.tournamentName}_({tournament.tournamentDate})_RatingReport.html")
+    
+
 def generatePDF(tournament):
 
 
@@ -149,13 +195,15 @@ def generatePDF(tournament):
         if player.getID() not in activePlayers:
             continue
         
-        d = [player.getName(), player.getID(), player.getOriginalRating(), player.getRating(), player.getRating()-player.getOriginalRating()]
+        d = [player.getID() ,player.getName(), player.getOriginalRating(), player.getRating(), player.getRating()-player.getOriginalRating()]
         data.append(d)
     
     
-    template = generateTemplate(data)
+    title = f"{tournament.tournamentName} ({tournament.tournamentDate}) Rating Report"
     
-    f = open(f"{tournament.tournamentName}_({tournament.tournamentDate})_RatingReport.html","w")
+    template = generateTemplate(data,title)
+    
+    f = open(f"{tournament.tournamentName}_({tournament.tournamentDate})_RatingReport.html","w+")
     f.write(template)
     f.close()
     
@@ -167,10 +215,12 @@ def generatePDF(tournament):
 
 
 
-def generateTemplate(data):
+def generateTemplate(data,title = ""):
     
     
-    format = "<html><table border='1'>"
+    format = f"<html> <h1>{title}</h1>"
+    
+    format += "<table>"
     
     format += f"<thead><tr>"
     
@@ -187,8 +237,10 @@ def generateTemplate(data):
             
         format += "</tr>"
         
+        
+    format += "<style>table, th, td {border: 1px solid black;border-collapse: collapse;}</style>"
     
-    return format + "</table></html>"
+    return format + f"</table><p>Generated by UCITT Rating Processor: {datetime.datetime.now()}</p></html>"
     
     
     

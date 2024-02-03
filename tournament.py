@@ -8,6 +8,7 @@ class Player:
         self.rating = initialRating
         self.originalRating = initialRating
         self.ratingHistory = [initialRating]
+        self.absoluteOriginalRating = self.rating
         self.resetPlayer()
         
         # self.finalRating = self.rating
@@ -21,6 +22,7 @@ class Player:
         
     def resetPlayer(self):
         self.originalRating = self.rating
+        
         self.pass1Gained = 0
         self.pass1Final = self.rating
         self.pass2Adjustment = self.rating
@@ -28,6 +30,8 @@ class Player:
         self.pass3Part2Adjustment = self.rating
         self.pass3Gained = 0
         self.pass2Adjustment = self.rating
+        
+        self.ratingHistory.append(self.originalRating)
         
         
     def setPass1Final(self, p1Final):
@@ -74,6 +78,9 @@ class Player:
     
     def getRating(self):
         return self.rating
+    
+    def getAbsoluteOriginalRating(self):
+        return self.ratingHistory[0]
     
     def setNewRating(self, rating):
         try:
@@ -137,6 +144,7 @@ class Tournament:
         self.tournamentDate = tournamentDate
         self.tournamentType = tournamentType
         self.listOfPlayers = listOfPlayers
+        self.specialRule = lambda x:-1
         
         for player in self.listOfPlayers:
             player.resetPlayer()
@@ -182,7 +190,9 @@ class Tournament:
         return matches
     
     
-    
+    def setSpecialRule(self, func):
+        self.specialRule = func
+        
     
     def importFile(self, file):
         

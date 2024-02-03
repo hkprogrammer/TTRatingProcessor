@@ -1,15 +1,13 @@
 name,ID,old rating,new rating,change
-Robin Jiang,2,475,575,100
+Robin Jiang,2,481,481,0
 Yu Guo,4,477,477,0
 Hitoki Kidahashi,8,1840,1848,8
-James Grossman,9,500,1186,686
-Milan Das,11,915,915,0
-Yixiao Xiong,12,782,1462,680
+James Grossman,9,500,1181,681
+Milan Das,11,915,885,-30
+Yixiao Xiong,12,783,1462,679
 Mahyar Abbasian,13,1212,1202,-10
-Gehui Zhou,14,763,887,124
+Gehui Zhou,14,763,879,116
 Brian Chen,15,1845,1787,-58
-Kaifan Yu,16,1065,1035,-30
-Tai Le,17,812,767,-45
 Jack Fink,18,1939,1894,-45
 Dahai Hao,19,1721,1811,90
 Rishikumar Gopalan,20,2026,1926,-100
